@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    volumes:
+      - ./dev:/var/www
+      - ./bash/permission.sh:/usr/local/bin/permission.sh
+    working_dir: /var/www
+    entrypoint: ["/usr/local/bin/permission.sh"]
+    command: ["php-fpm"]
+    networks:
+      - app-network
+    depends_on:
+      - db
+
+  db:
+    image: mariadb:10
+    container_name: mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: dynamice
+      MYSQL_USER: su
+      MYSQL_PASSWORD: suadmin
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network
+
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./dev:/var/www
+    networks:
+      - app-network
+    depends_on:
+      - app
+
+  node:
+    image: node:16-alpine
+    container_name: node
+    working_dir: /var/www
+    volumes:
+      - ./dev:/var/www
+      - /var/www/node_modules
+      - ./dev/package.json:/var/www/package.json
+      - ./dev/package-lock.json:/var/www/package-lock.json
+    command: tail -f /dev/null
+    networks:
+      - app-network
+
+volumes:
+  db_data:
+
+networks:
+  app-network:
+    driver: bridge
