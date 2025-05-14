@@ -8,10 +8,10 @@ services:
     container_name: app
     volumes:
       - ./dev:/var/www
-      - ./bash/permission.sh:/usr/local/bin/permission.sh
     working_dir: /var/www
-    entrypoint: ["/usr/local/bin/permission.sh"]
     command: ["php-fpm"]
+    ports:
+      - "8000:8000"
     networks:
       - app-network
     depends_on:
@@ -26,39 +26,22 @@ services:
       MYSQL_USER: su
       MYSQL_PASSWORD: suadmin
     volumes:
-      - db_data:/var/lib/mysql
+      - db-data:/var/lib/mysql
     networks:
       - app-network
-
-  caddy:
-    image: caddy:2
-    container_name: caddy
-    restart: always
-    ports:
-      - "80:80"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile
-      - ./dev:/var/www
-    networks:
-      - app-network
-    depends_on:
-      - app
 
   node:
     image: node:16-alpine
     container_name: node
     working_dir: /var/www
+    command: tail -f /dev/null
     volumes:
       - ./dev:/var/www
-      - /var/www/node_modules
-      - ./dev/package.json:/var/www/package.json
-      - ./dev/package-lock.json:/var/www/package-lock.json
-    command: tail -f /dev/null
     networks:
       - app-network
 
 volumes:
-  db_data:
+  db-data:
 
 networks:
   app-network:
