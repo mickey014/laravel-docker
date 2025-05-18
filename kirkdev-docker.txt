@@ -12,12 +12,11 @@ docker compose up -d
 
 command to use in services like (artisan, node and etc.)
 docker compose exec app php artisan migrate
-docker exec app composer create-project --prefer-dist laravel/laravel:^7.0 dev
 docker exec node npm install && docker exec npm run dev
 
 
 access mariadb to your local machine
-go to your env file it should be there
+credentials is on docker-compose.yml which is db container
 host address: ******
 username: ******
 password: ******
@@ -28,6 +27,6 @@ database: ******
 docker exec app php artisan serve --host=0.0.0.0 --port=8000
 access it on http://localhost:8000/
 
-#install laravel 7
+#install laravel 11
 cd dev
-docker compose exec app composer create-project --prefer-dist laravel/laravel:^7.0 .
+docker compose exec app composer create-project --prefer-dist laravel/laravel:^11.0 .

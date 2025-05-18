@@ -29,6 +29,8 @@ services:
       - db-data:/var/lib/mysql
     networks:
       - app-network
+    ports:
+      - "3306:3306"
 
   node:
     image: node:18-bullseye
